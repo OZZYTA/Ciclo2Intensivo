@@ -7,10 +7,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.sql.SQLException;
@@ -28,7 +28,7 @@ public class Controlador {
     public Controlador() {
         try (Connection conn = DriverManager.getConnection(URL,USER,CLAVE);
                 Statement stmt = conn.createStatement();){
-                String sql="CREATE TABLE IF NOT EXISTS ventas(id INT NOT NULL, "
+                String sql="CREATE TABLE IF NOT EXISTS ventas(id INT NOT NULL AUTO_INCREMENT, "
                         + "fecha DATE NOT NULL, numVenta INT(5) NOT NULL, "
                         + "cliente VARCHAR(100) NOT NULL, "
                         + "producto VARCHAR(100) NOT NULL, "
@@ -102,6 +102,7 @@ public class Controlador {
         }
         return opcion;
     }
+    
 
     public void ingresar() {
         long milisegundos = System.currentTimeMillis();
@@ -128,10 +129,25 @@ public class Controlador {
         String vendedor = input.nextLine();
 
         Venta nuevaVenta = new Venta(fecha, numVenta, cliente, producto, precio, cantidad, vendedor);
-        this.listaVentas.add(nuevaVenta);
-        System.out.println("Venta registrada correctamente.\n");
+        
+        //Ahora lo mandamos a base de datos
+        try (Connection conn = DriverManager.getConnection(URL,USER,CLAVE);
+                Statement stmt = conn.createStatement();){
+                String sql="INSERT INTO ventas (id, fecha, numVenta, cliente, "
+                        + "producto, precio, cantidad, vendedor) "
+                        + "VALUES("+nuevaVenta.getId()+",'"+fecha+"',"
+                        + ""+numVenta+",'"+cliente+"','"+producto+"',"
+                        +precio+","+cantidad+",'"+vendedor+"');";
+         
+                stmt.executeUpdate(sql);
+                System.out.println("Venta registrada correctamente");
+                }catch (SQLException e){
+                System.out.println("No se pudo registrar esta venta");
+                e.printStackTrace();
+                }
+       
 
-    }
+    } 
 
     public static Venta buscar(int numeroVenta) {
         Venta resultado = null; //Por defecto, garantizo el return
@@ -143,6 +159,7 @@ public class Controlador {
         }
         return resultado;
     }
+    
 
     public void Modificar() {
         System.out.println("Ingrese el numero de la venta que desea modificar: ");
@@ -183,19 +200,19 @@ public class Controlador {
     }
 
     public void Eliminar() {
-        System.out.println("Por favor ingrese el numero de la venta que desea eliminar: ");
+        System.out.println("Por favor ingrese el id de la venta que desea eliminar: ");
         int numero = input.nextInt();
-        Venta aEliminar = buscar(numero);
-        if (aEliminar != null) { //Verificamos que el objeto no este vacio
-            for (int i = 0; i < this.listaVentas.size(); i++) {
-                if (this.listaVentas.get(i).getNumVenta() == numero) {
-                    this.listaVentas.remove(i);
+        ///ELIMINAR EN LA BASE DE DATOS
+        try (Connection conn = DriverManager.getConnection(URL,USER,CLAVE);
+                Statement stmt = conn.createStatement();){
+                String sql="DELETE FROM ventas WHERE id="+numero+";";
+         
+                stmt.executeUpdate(sql);
+                System.out.println("Venta Eliminada correctamente");
+                }catch (SQLException e){
+                System.out.println("Hubo un error eliminando, tal vez esa venta no existe");
+                e.printStackTrace();
                 }
-            }
-            System.out.println("Venta eliminada correctamente.\n");
-        } else {
-            System.out.println("Esta venta no esta registrada. \n");
-        }
 
     }
 
