@@ -6,21 +6,46 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.InputMismatchException;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.sql.SQLException;
 import modelos.Venta;
 import vista.Vista;
 import static vista.Vista.menuPrincipal;
 
 public class Controlador {
-
-    public static ArrayList<Venta> listaVentas = new ArrayList<>(); //Parametro principal
+    public static ArrayList<Venta> listaVentas; //Parametro principal
     public static Scanner input = new Scanner(System.in); //Parametro principal
+    public static final String URL="jdbc:mysql://localhost:3306/tiendaMascotas";
+    public static final String USER="root";
+    public static final String CLAVE="";
 
+    public Controlador() {
+        try (Connection conn = DriverManager.getConnection(URL,USER,CLAVE);
+                Statement stmt = conn.createStatement();){
+                String sql="CREATE TABLE IF NOT EXISTS ventas(id INT NOT NULL, "
+                        + "fecha DATE NOT NULL, numVenta INT(5) NOT NULL, "
+                        + "cliente VARCHAR(100) NOT NULL, "
+                        + "producto VARCHAR(100) NOT NULL, "
+                        + "precio FLOAT(11) NOT NULL, "
+                        + "cantidad INT(3) NOT NULL, "
+                        + "vendedor VARCHAR(100) NOT NULL, PRIMARY KEY (id));";
+                stmt.executeUpdate(sql);
+                System.out.println("Conectados a la base, pudimos encontrar o crear la base");
+                }catch (SQLException e){
+                System.out.println("No nos pudimos conectar a la base de datos");
+                e.printStackTrace();
+                }
+    }
+
+    
+    
+    
     public void trabajar() {
         OUTER:
         while (true) {
