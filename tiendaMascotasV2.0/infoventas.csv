@@ -1,0 +1,4 @@
+ID,Fecha,No. Venta, Cliente, Producto, Precio, Cantidad, Vendedor, Venta Total
+4,2022-10-16,123,Claudia Torres,Champu Antipulgas,18000.0,2,Lola Pérez,36000.0
+6,2022-10-16,1231,Crisanta Lopez,Alimento seco para Perros,51000.0,1,Lola Pérez,51000.0
+8,2022-10-16,4,Helena Colmenares,Juguete interactivo,3800.0,12,Lola Pérez,45600.0
